@@ -26,19 +26,22 @@ namespace SignalR.Hubs
 
         public async Task SelectChoice(PizzaChoice choice)
         {
-            await Clients.Caller.SendAsync("func", choice);
+            await Groups.AddToGroupAsync(Context.ConnectionId, _pizzaManager.GetGroupName(choice));
         }
 
         public async Task UnselectChoice(PizzaChoice choice)
         {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, _pizzaManager.GetGroupName(choice));
         }
 
         public async Task AddMoney(PizzaChoice choice)
         {
+            _pizzaManager.IncreaseMoney(choice);
         }
 
         public async Task BuyPizza(PizzaChoice choice)
         {
+           _pizzaManager.BuyPizza(choice);
         }
     }
 }
