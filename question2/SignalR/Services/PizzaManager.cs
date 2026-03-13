@@ -1,4 +1,6 @@
-﻿namespace SignalR.Services
+﻿using SignalR.Events;
+
+namespace SignalR.Services
 {
     // Pizza avec ou sans ananas
     public enum PizzaChoice
@@ -18,14 +20,16 @@
         public int[] Money { get; private set; } = new int[2];
         public int[] NbPizzas { get; private set; } = new int[2];
 
-        public void AddUser()
+        public UpdateNbUsersEvent AddUser()
         {
             NbConnectedUsers++;
+            return new UpdateNbUsersEvent(NbConnectedUsers);
         }
 
-        public void RemoveUser()
+        public UpdateNbUsersEvent RemoveUser()
         {
             NbConnectedUsers--;
+            return new UpdateNbUsersEvent(NbConnectedUsers);
         }
 
         public void IncreaseMoney(PizzaChoice choice)
