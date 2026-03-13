@@ -62,7 +62,7 @@ export class AppComponent {
     console.log("ApplyingEvent: " + event.eventType)
     switch(event.eventType){
       case "UpdateNbUsers": {
-        this.nbUsers++
+        this.nbUsers = event.UpdateNbUsersEvent;
         break;
       }
       case "UpdateMoney": {

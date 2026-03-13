@@ -32,12 +32,13 @@ namespace SignalR.Services
             return new UpdateNbUsersEvent(NbConnectedUsers);
         }
 
-        public void IncreaseMoney(PizzaChoice choice)
+        public UpdateMoneyEvent IncreaseMoney(PizzaChoice choice)
         {
             Money[(int)choice] += MONEY_INCREMENT;
+            return new UpdateMoneyEvent(Money[(int)choice]);
         }
 
-        public void BuyPizza(PizzaChoice choice)
+        public UpdateNbPizzasAndMoney BuyPizza(PizzaChoice choice)
         {
             // Si il y a assez d'argent
             if(Money[(int)choice] >= PIZZA_PRICES[(int)choice])
@@ -47,6 +48,7 @@ namespace SignalR.Services
                 // Et augmente le nombre de pizzas
                 NbPizzas[(int)choice]++;
             }
+            return new UpdateNbPizzasAndMoney(NbPizzas[(int)choice] , Money[(int)choice]);
         }
 
         public string GetGroupName(PizzaChoice choice)

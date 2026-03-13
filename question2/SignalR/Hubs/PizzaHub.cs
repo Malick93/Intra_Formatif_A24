@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using SignalR.Events;
 using SignalR.Services;
 
 namespace SignalR.Hubs
@@ -36,7 +37,9 @@ namespace SignalR.Hubs
 
         public async Task AddMoney(PizzaChoice choice)
         {
-            _pizzaManager.IncreaseMoney(choice);
+            PizzaEvent pizza = _pizzaManager.IncreaseMoney(choice);
+
+            await Clients.Group(_pizzaManager.GetGroupName(choice)).SendAsync("Event", pizza as PizzaEvent);
         }
 
         public async Task BuyPizza(PizzaChoice choice)
