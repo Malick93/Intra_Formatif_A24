@@ -38,10 +38,11 @@ namespace SignalR.Events
     }
     public class UpdatePizzaPrice : PizzaEvent
     {
-        public override string EventType { get { return "UpdateNbPizzasAndMoney"; } }
-        public UpdatePizzaPrice()
+        public override string EventType { get { return "UpdatePizzaPrice"; } }
+        public int PizzaPrice { get; set; }
+        public UpdatePizzaPrice(int pizzaPrice)
         {
-            
+            PizzaPrice = pizzaPrice;
         }
     }
     

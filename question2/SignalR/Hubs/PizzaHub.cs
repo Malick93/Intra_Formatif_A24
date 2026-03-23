@@ -14,20 +14,23 @@ namespace SignalR.Hubs
 
         public override async Task OnConnectedAsync()
         {
+            var evt = _pizzaManager.AddUser();
+            await Clients.All.SendAsync("UpdateNbUsers", evt.NbUsers);
             await base.OnConnectedAsync();
-            _pizzaManager.AddUser();
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            await base.OnConnectedAsync();
+            var evt = _pizzaManager.RemoveUser();
+            await Clients.All.SendAsync("UpdateNbUsers", evt.NbUsers);
+            await base.OnDisconnectedAsync(exception);
 
-            _pizzaManager.RemoveUser();
         }
 
         public async Task SelectChoice(PizzaChoice choice)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, _pizzaManager.GetGroupName(choice));
+            await Clients.Caller.SendAsync("UpdatePizzaPrice", _pizzaManager.PIZZA_PRICES[(int)choice]); 
         }
 
         public async Task UnselectChoice(PizzaChoice choice)
@@ -37,14 +40,16 @@ namespace SignalR.Hubs
 
         public async Task AddMoney(PizzaChoice choice)
         {
-            PizzaEvent pizza = _pizzaManager.IncreaseMoney(choice);
+            var evt = _pizzaManager.IncreaseMoney(choice);
 
-            await Clients.Group(_pizzaManager.GetGroupName(choice)).SendAsync("Event", pizza as PizzaEvent);
+            await Clients.Group(_pizzaManager.GetGroupName(choice)).SendAsync("UpdateMoney", evt.Money);
         }
 
         public async Task BuyPizza(PizzaChoice choice)
         {
-           _pizzaManager.BuyPizza(choice);
+            var evt = _pizzaManager.BuyPizza(choice);
+            await Clients.Group(_pizzaManager.GetGroupName(choice)).SendAsync("UpdateNbPizzasAndMoney", evt.NbPizzas, evt.Money);
+            _pizzaManager.BuyPizza(choice);
         }
     }
 }
