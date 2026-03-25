@@ -38,6 +38,19 @@ export class AppComponent {
         .then(() => {
             this.isConnected = true;
             console.log("connected")
+            this.hubConnection?.on("UpdateNbUsers", (nbUsers) =>{
+              this.nbUsers = nbUsers;
+            })
+            this.hubConnection?.on("UpdateMoney", (money) => {
+              this.money = money;
+            })
+            this.hubConnection?.on("UpdateNbPizzasAndMoney", (nbPizzas, money) => {
+              this.nbPizzas = nbPizzas;
+              this.money = money;
+            })
+            this.hubConnection?.on("UpdatePizzaPrice", (price) => {
+              this.pizzaPrice = price;
+            })
         })
   }
 
@@ -57,31 +70,5 @@ export class AppComponent {
 
   buyPizza() {
     this.hubConnection!.invoke('BuyPizza', this.selectedChoice)
-  }
-  async applyEvent(event:any){
-    console.log("ApplyingEvent: " + event.eventType)
-    switch(event.eventType){
-      case "UpdateNbUsers": {
-        this.nbUsers = event.UpdateNbUsersEvent;
-        break;
-      }
-      case "UpdateMoney": {
-        
-        break;
-      }
-      case "UpdateNbPizzasAndMoney": {
-
-        break;
-      }
-      case "UpdatePizzaPrice": {
-
-        break;
-      }
-    }
-    if(event.events){
-        for(let e of event.events){
-            await this.applyEvent(e);
-        }
-    }
   }
 }

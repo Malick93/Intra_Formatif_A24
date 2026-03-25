@@ -14,42 +14,67 @@ namespace SignalR.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            var evt = _pizzaManager.AddUser();
-            await Clients.All.SendAsync("UpdateNbUsers", evt.NbUsers);
+            _pizzaManager.AddUser();
+
+            await Clients.All.SendAsync("UpdateNbUsers", _pizzaManager.NbConnectedUsers);
+
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            var evt = _pizzaManager.RemoveUser();
-            await Clients.All.SendAsync("UpdateNbUsers", evt.NbUsers);
-            await base.OnDisconnectedAsync(exception);
+            _pizzaManager.RemoveUser();
 
+            await Clients.All.SendAsync("UpdateNbUsers", _pizzaManager.NbConnectedUsers);
+
+            await base.OnDisconnectedAsync(exception);
         }
 
         public async Task SelectChoice(PizzaChoice choice)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, _pizzaManager.GetGroupName(choice));
-            await Clients.Caller.SendAsync("UpdatePizzaPrice", _pizzaManager.PIZZA_PRICES[(int)choice]); 
+            string groupName = _pizzaManager.GetGroupName(choice);
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+
+            await Clients.Caller.SendAsync("UpdatePizzaPrice", _pizzaManager.PIZZA_PRICES[(int)choice]);
+
+            await Clients.Group(groupName).SendAsync(
+                "UpdateNbPizzasAndMoney",
+                _pizzaManager.NbPizzas[(int)choice],
+                _pizzaManager.Money[(int)choice]
+            );
         }
 
         public async Task UnselectChoice(PizzaChoice choice)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, _pizzaManager.GetGroupName(choice));
+            string groupName = _pizzaManager.GetGroupName(choice);
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
 
         public async Task AddMoney(PizzaChoice choice)
         {
-            var evt = _pizzaManager.IncreaseMoney(choice);
+            _pizzaManager.IncreaseMoney(choice);
 
-            await Clients.Group(_pizzaManager.GetGroupName(choice)).SendAsync("UpdateMoney", evt.Money);
+            string groupName = _pizzaManager.GetGroupName(choice);
+
+            await Clients.Group(groupName).SendAsync(
+                "UpdateMoney",
+                _pizzaManager.Money[(int)choice]
+            );
         }
 
         public async Task BuyPizza(PizzaChoice choice)
         {
-            var evt = _pizzaManager.BuyPizza(choice);
-            await Clients.Group(_pizzaManager.GetGroupName(choice)).SendAsync("UpdateNbPizzasAndMoney", evt.NbPizzas, evt.Money);
             _pizzaManager.BuyPizza(choice);
+
+            string groupName = _pizzaManager.GetGroupName(choice);
+
+            await Clients.Group(groupName).SendAsync(
+                "UpdateNbPizzasAndMoney",
+                _pizzaManager.NbPizzas[(int)choice],
+                _pizzaManager.Money[(int)choice]
+            );
         }
     }
 }

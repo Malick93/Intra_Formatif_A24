@@ -5,7 +5,7 @@ import { UserService } from './user.service';
 export const guard1: CanActivateFn = (route, state) => {
   let user = localStorage.getItem('user')
   if(user != null){
-     if(!inject(UserService).currentUser == JSON.parse(user)){
+     if(!inject(UserService).currentUser?.username == JSON.parse(user).username){
       return createUrlTreeFromSnapshot(route, ["/login"])
     }
   }

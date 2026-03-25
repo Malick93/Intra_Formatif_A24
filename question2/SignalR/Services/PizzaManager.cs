@@ -20,35 +20,31 @@ namespace SignalR.Services
         public int[] Money { get; private set; } = new int[2];
         public int[] NbPizzas { get; private set; } = new int[2];
 
-        public UpdateNbUsersEvent AddUser()
+        public void AddUser()
         {
             NbConnectedUsers++;
-            return new UpdateNbUsersEvent(NbConnectedUsers);
         }
 
-        public UpdateNbUsersEvent RemoveUser()
+        public void RemoveUser()
         {
             NbConnectedUsers--;
-            return new UpdateNbUsersEvent(NbConnectedUsers);
         }
 
-        public UpdateMoneyEvent IncreaseMoney(PizzaChoice choice)
+        public void IncreaseMoney(PizzaChoice choice)
         {
             Money[(int)choice] += MONEY_INCREMENT;
-            return new UpdateMoneyEvent(Money[(int)choice]);
         }
 
-        public UpdateNbPizzasAndMoney BuyPizza(PizzaChoice choice)
+        public void BuyPizza(PizzaChoice choice)
         {
             // Si il y a assez d'argent
-            if(Money[(int)choice] >= PIZZA_PRICES[(int)choice])
+            if (Money[(int)choice] >= PIZZA_PRICES[(int)choice])
             {
                 // On retire l'argent
                 Money[(int)choice] -= PIZZA_PRICES[(int)choice];
                 // Et augmente le nombre de pizzas
                 NbPizzas[(int)choice]++;
             }
-            return new UpdateNbPizzasAndMoney(NbPizzas[(int)choice] , Money[(int)choice]);
         }
 
         public string GetGroupName(PizzaChoice choice)
@@ -57,3 +53,4 @@ namespace SignalR.Services
         }
     }
 }
+
